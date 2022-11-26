@@ -3,6 +3,8 @@ package com.mercadolivro.controller
 import com.mercadolivro.model.CustomerModel
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -11,8 +13,14 @@ import org.springframework.web.bind.annotation.RestController
 class CustomerController {
 
     @GetMapping
-    fun hgetCustomers():CustomerModel{
+    fun getCustomers():CustomerModel{
 
         return CustomerModel(1,"Willian","email@email.com")
+    }
+
+    @PostMapping
+    fun posttCustomers(@RequestBody customer:CustomerModel):CustomerModel{
+
+        return customer
     }
 }
