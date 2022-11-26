@@ -3,6 +3,7 @@ package com.mercadolivro.controller
 import com.mercadolivro.model.CustomerModel
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -21,9 +22,13 @@ class CustomerController {
 
 
     @GetMapping
-    fun getCustomers(): ResponseEntity<List<CustomerModel>> {
-
-        return ResponseEntity.ok(customers1)
+    fun getCustomers(@RequestParam name:String?): List<CustomerModel> {
+        name?.let {
+            return customers1.filter {
+                it.name.contains(name, true)
+            }
+        }
+        return customers1
     }
 
     @GetMapping("/{id}")
@@ -40,6 +45,12 @@ class CustomerController {
             it.email = customer.email
         }
         return ResponseEntity.ok( customers1.filter { it.id == id }.first())
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteCustomer(@PathVariable id:Long) {
+        customers1.removeIf { it.id == id }
     }
 
     @PostMapping
