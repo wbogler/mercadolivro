@@ -1,6 +1,7 @@
 package com.mercadolivro.controller
 
 import com.mercadolivro.model.CustomerModel
+import com.mercadolivro.service.CustomerService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -16,51 +17,34 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("customers")
-class CustomerController {
-
-    val customers1 = mutableListOf<CustomerModel>()
-
-
+class CustomerController(
+    val customerService: CustomerService
+) {
     @GetMapping
     fun getCustomers(@RequestParam name:String?): List<CustomerModel> {
-        name?.let {
-            return customers1.filter {
-                it.name.contains(name, true)
-            }
-        }
-        return customers1
+        return customerService.getCustomers(name)
     }
 
     @GetMapping("/{id}")
     fun getCustomer(@PathVariable id:Long): ResponseEntity<CustomerModel>{
-        return ResponseEntity.ok(customers1.filter { it.id == id }.first())
+        return customerService.getCustomer(id)
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun updateCustomer(@PathVariable id:Long, @RequestBody customer: CustomerModel): ResponseEntity<CustomerModel> {
-       customers1.filter { it.id == id }.first().let {
-            it.id = id
-            it.name = customer.name
-            it.email = customer.email
-        }
-        return ResponseEntity.ok( customers1.filter { it.id == id }.first())
+        return ResponseEntity.ok(customerService.updateCustomer(id, customer))
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteCustomer(@PathVariable id:Long) {
-        customers1.removeIf { it.id == id }
+        customerService.deleteCustomer(id)
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun postCustomers(@RequestBody customer:CustomerModel){
-        var id = if(customers1.isEmpty()){
-            1
-        }else{
-            customers1.last().id+1
-        }
-        customers1.add(CustomerModel(id,customer.name,customer.email))
+    fun postCustomers(@RequestBody customer:CustomerModel) {
+        customerService.postCustomers(customer)
     }
 }
