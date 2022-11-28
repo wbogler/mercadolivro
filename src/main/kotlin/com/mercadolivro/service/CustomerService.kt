@@ -1,49 +1,48 @@
 package com.mercadolivro.service
 
+import com.mercadolivro.dto.CustomerDTO
 import com.mercadolivro.model.CustomerModel
+import com.mercadolivro.repository.Customerrepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.*
+import java.lang.Exception
 
 @Service
-class CustomerService {
-    val customers1 = mutableListOf<CustomerModel>()
+class CustomerService(
+    val customerRepository: Customerrepository
+) {
 
     @GetMapping
     fun getCustomers(name:String?): List<CustomerModel> {
         name?.let {
-            return customers1.filter {
-                it.name.contains(name, true)
-            }
+            return customerRepository.findByNameContainig(name).toList()
         }
-        return customers1
+        return customerRepository.findAll().toList()
     }
 
-    fun getCustomer( id:Long): ResponseEntity<CustomerModel> {
-        return ResponseEntity.ok(customers1.filter { it.id == id }.first())
+    fun getCustomer( id:Int): CustomerModel {
+        return customerRepository.findById(id).orElseThrow()
     }
 
-    fun updateCustomer( id:Long, customer: CustomerModel): CustomerModel {
-        customers1.filter { it.id == id }.first().let {
-            it.id = id
-            it.name = customer.name
-            it.email = customer.email
+    fun updateCustomer( customer: CustomerModel): CustomerModel {
+        if(!customerRepository.existsById(customer.id!!)){
+            throw Exception()
         }
-        return customers1.filter { it.id == id }.first()
+        return customerRepository.save(customer)
     }
 
-    fun deleteCustomer(id:Long) {
-        customers1.removeIf { it.id == id }
-    }
-
-    fun postCustomers( customer:CustomerModel){
-        var id = if(customers1.isEmpty()){
-            1
-        }else{
-            customers1.last().id+1
+    fun deleteCustomer(id:Int) {
+        if(!customerRepository.existsById(id)){
+            throw Exception()
         }
-        customers1.add(CustomerModel(id,customer.name,customer.email))
+        customerRepository.deleteById(id)
+    }
+
+    fun postCustomers( customer: CustomerDTO){
+        var customerCreat: CustomerModel = CustomerModel(null,customer.name,customer.email)
+        customerRepository.save(customerCreat)
     }
 
 }

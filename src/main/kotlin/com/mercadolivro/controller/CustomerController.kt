@@ -1,5 +1,6 @@
 package com.mercadolivro.controller
 
+import com.mercadolivro.dto.CustomerDTO
 import com.mercadolivro.model.CustomerModel
 import com.mercadolivro.service.CustomerService
 import org.springframework.http.HttpStatus
@@ -26,25 +27,25 @@ class CustomerController(
     }
 
     @GetMapping("/{id}")
-    fun getCustomer(@PathVariable id:Long): ResponseEntity<CustomerModel>{
+    fun getCustomer(@PathVariable id:Int): CustomerModel {
         return customerService.getCustomer(id)
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/atualizar")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun updateCustomer(@PathVariable id:Long, @RequestBody customer: CustomerModel): ResponseEntity<CustomerModel> {
-        return ResponseEntity.ok(customerService.updateCustomer(id, customer))
+    fun updateCustomer(@RequestBody customer: CustomerModel): ResponseEntity<CustomerModel> {
+        return ResponseEntity.ok(customerService.updateCustomer(customer))
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteCustomer(@PathVariable id:Long) {
+    fun deleteCustomer(@PathVariable id:Int) {
         customerService.deleteCustomer(id)
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun postCustomers(@RequestBody customer:CustomerModel) {
+    fun creatCustomers(@RequestBody customer: CustomerDTO) {
         customerService.postCustomers(customer)
     }
 }
